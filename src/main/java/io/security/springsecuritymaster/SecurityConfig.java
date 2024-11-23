@@ -31,31 +31,9 @@ public class SecurityConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 			.authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-			.formLogin(form -> form
-				.loginPage("/loginPage")
-				.loginProcessingUrl("/loginProc")
-				.defaultSuccessUrl("/", true)
-				.failureUrl("/failed")
-				.usernameParameter("userId")
-				.passwordParameter("passwd")
-				.successHandler(new AuthenticationSuccessHandler() {
-					@Override
-					public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-						Authentication authentication) throws IOException, ServletException {
-						log.info("authentication: " + authentication);
-						response.sendRedirect("/home");
-					}
-				})
-				.failureHandler(new AuthenticationFailureHandler() {
-					@Override
-					public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,
-						AuthenticationException exception) throws IOException, ServletException {
-						log.info("exception: " + exception.getMessage());
-						response.sendRedirect("/login");
-					}
-				})
-				.permitAll()
-			)
+			.httpBasic(basic -> basic
+				.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
+
 			.build();
 	}
 
